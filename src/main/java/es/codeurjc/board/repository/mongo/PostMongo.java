@@ -1,23 +1,17 @@
-package es.codeurjc.board.model;
+package es.codeurjc.board.repository.mongo;
 
-import java.sql.Blob;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+@Document
+public class PostMongo {
 
-@Entity
-public class Post {
-
+	private static AtomicLong nextId = new AtomicLong(0);
+	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
 	private String user;
@@ -25,18 +19,16 @@ public class Post {
 	private String text;
 	private String image;
 
-	@OneToMany
-	private List<Comment> comments;
+	private List<CommentMongo> comments;
 
-	@Lob
-	@JsonIgnore
-	private Blob imageFile;
+	private byte[] imageFile;
 
-	public Post() {
+	public PostMongo() {
+		this.id = nextId.getAndIncrement();
 	}
 
-	public Post(String user, String title, String text) {
-		super();
+	public PostMongo(String user, String title, String text) {
+		this();
 		this.user = user;
 		this.title = title;
 		this.text = text;
@@ -82,15 +74,15 @@ public class Post {
 		this.image = image;
 	}
 
-	public Blob getImageFile() {
+	public byte[] getImageFile() {
 		return imageFile;
 	}
 
-	public void setImageFile(Blob image) {
+	public void setImageFile(byte[] image) {
 		this.imageFile = image;
 	}
 
-	public void addComment(Comment savedComment) {
+	public void addComment(CommentMongo savedComment) {
 		this.comments.add(savedComment);
 	}
 }
